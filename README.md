@@ -8,3 +8,9 @@ SwedbankJson
 - [ ] Clean up the code
 
 This was made thanks to [walle89](https://github.com/walle89) for his [PHP wrapper](https://github.com/walle89/SwedbankJson).
+
+
+License
+=======
+
+Summary: MIT License
