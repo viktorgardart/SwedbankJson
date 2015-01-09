@@ -26,10 +26,10 @@
 -(NSDictionary *)profileList;
 -(NSDictionary *)reminders;
 -(NSDictionary *)baseInfo;
--(NSDictionary *)accountList;
--(NSDictionary *)portfolioList;
+-(NSDictionary *)accountList:(NSString *)profileId;
+-(NSDictionary *)portfolioList:(NSString *)profileId;
 -(NSDictionary *)accountDetails:(NSString *)accoutId transactionsPerPage:(int)transactionsPerPage page:(int)page;
--(NSDictionary *)quickBalanceAccounts;
+-(NSDictionary *)quickBalanceAccounts:(NSString *)profileId;
 
 -(NSDictionary *)terminate;
 

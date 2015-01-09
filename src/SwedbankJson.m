@@ -138,8 +138,8 @@ NSString *queryString;
     return [self getRequest:@"transfer/baseinfo"];
 }
 
--(NSDictionary *)accountList {
-    [self selectProfile:@""];
+-(NSDictionary *)accountList:(NSString *)profileId {
+    [self selectProfile:profileId];
     
     NSDictionary *data = [self getRequest:@"engagement/overview"];
     
@@ -152,8 +152,8 @@ NSString *queryString;
     return data;
 }
 
--(NSDictionary *)portfolioList {
-    [self selectProfile:@""];
+-(NSDictionary *)portfolioList:(NSString *)profileId {
+    [self selectProfile:profileId];
     NSDictionary *data = [self getRequest:@"portfolio/holdings"];
     
     if (!data[@"savingsAccounts"]) {
@@ -165,9 +165,9 @@ NSString *queryString;
     return data;
 }
 
--(NSDictionary *)accountDetails:(NSString *)accoutId transactionsPerPage:(int)transactionsPerPage page:(int)page {
-    if (accoutId.length == 0) {
-        accoutId = [self accountList][@"transactionAccounts"][0][@"id"];
+-(NSDictionary *)accountDetails:(NSString *)accountId transactionsPerPage:(int)transactionsPerPage page:(int)page {
+    if (accountId.length == 0) {
+        accountId = [self accountList:@""][@"transactionAccounts"][0][@"id"];
     }
     
     NSMutableDictionary *query;
@@ -176,7 +176,7 @@ NSString *queryString;
         [query setValue:[@(page) stringValue] forKey:@"page"];
     }
     
-    NSDictionary *data = [self getRequest:[@"engagement/transactions/" stringByAppendingString:accoutId] query:query];
+    NSDictionary *data = [self getRequest:[@"engagement/transactions/" stringByAppendingString:accountId] query:query];
     
     if (!data[@"transactions"]) {
         @throw [NSException exceptionWithName:@"Account error"
@@ -187,8 +187,8 @@ NSString *queryString;
     return data;
 }
 
--(NSDictionary *)quickBalanceAccounts {
-    [self selectProfile:@""];
+-(NSDictionary *)quickBalanceAccounts:(NSString *)profileId {
+    [self selectProfile:profileId];
     NSDictionary *data = [self getRequest:@"quickbalance/accounts"];
     
     if (!data[@"accounts"]) {
@@ -322,9 +322,6 @@ NSString *queryString;
 }
 
 -(id)createRequest:(NSString *)method apiRequest:(NSString *)apiRequest {
-    NSArray                 *cookies;
-    NSDictionary            *cookieHeaders;
-    
     _dsidStr = [self dsid:8];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: [NSURL URLWithString:[NSString stringWithFormat:@"%@%@?dsid=%@", _baseUri, apiRequest, _dsidStr]]];
@@ -339,12 +336,12 @@ NSString *queryString;
     [request setValue:@"keep-alive" forHTTPHeaderField:@"Proxy-Connection"];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
-    cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:[NSURL URLWithString:_baseUri]];
+    NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:[NSURL URLWithString:_baseUri]];
     
     if (!cookies) {
         [request setValue:[@"dsid=" stringByAppendingString:_dsidStr] forHTTPHeaderField:@"Cookie"];
     }else {
-        cookieHeaders = [NSHTTPCookie requestHeaderFieldsWithCookies: cookies];
+        NSDictionary *cookieHeaders = [NSHTTPCookie requestHeaderFieldsWithCookies: cookies];
         NSString *realCookie = [cookieHeaders objectForKey:@"Cookie"];
         realCookie = [realCookie stringByAppendingString:[@";dsid=" stringByAppendingString:_dsidStr]];
         [request setValue:realCookie forHTTPHeaderField: @"Cookie"];
@@ -354,9 +351,6 @@ NSString *queryString;
 }
 
 -(id)createRequest:(NSString *)method apiRequest:(NSString *)apiRequest query:(NSDictionary *)query {
-    NSArray                 *cookies;
-    NSDictionary            *cookieHeaders;
-    
     _dsidStr = [self dsid:8];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: [NSURL URLWithString:[NSString stringWithFormat:@"%@%@?dsid=%@", _baseUri, apiRequest, _dsidStr]]];
@@ -372,12 +366,12 @@ NSString *queryString;
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:[self addQueryStringToUrlString:query] forHTTPHeaderField:@"query"];
     
-    cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:[NSURL URLWithString:_baseUri]];
+    NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:[NSURL URLWithString:_baseUri]];
     
     if (!cookies) {
         [request setValue:[@"dsid=" stringByAppendingString:_dsidStr] forHTTPHeaderField:@"Cookie"];
     }else {
-        cookieHeaders = [NSHTTPCookie requestHeaderFieldsWithCookies: cookies];
+        NSDictionary *cookieHeaders = [NSHTTPCookie requestHeaderFieldsWithCookies: cookies];
         NSString *realCookie = [cookieHeaders objectForKey:@"Cookie"];
         realCookie = [realCookie stringByAppendingString:[@";dsid=" stringByAppendingString:_dsidStr]];
         [request setValue:realCookie forHTTPHeaderField: @"Cookie"];
