@@ -3,7 +3,7 @@ SwedbankJson
 
 **Todo:**
 - [ ] Fix asynchronous requests
-- [ ] Make a pod of it
+- [x] Make a pod of it
 - [ ] Write some examples
 - [ ] Clean up the code
 - [ ] Comment the code
